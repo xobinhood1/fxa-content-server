@@ -76,6 +76,7 @@ set -o xtrace # echo the following commands
 npm install                  \
   bluebird@3.3.5             \
   bower@1.7.9                \
+  css@2.2.1                  \
   convict@1.3.0              \
   extend@3.0.0               \
   firefox-profile@0.3.12     \

@@ -11,9 +11,11 @@ define([
   'intern/dojo/node!htmlparser2',
   'intern/dojo/node!request',
   'intern/dojo/node!url',
-  'intern/node_modules/dojo/Promise'
+  'intern/node_modules/dojo/Promise',
+  'intern/dojo/node!./lib/discover-css-resources'
 ], function (intern, registerSuite, assert, config, csp,
-  htmlparser2, request, url, Promise) {
+             htmlparser2, request, url, Promise, discoverCssResources) {
+
   var httpUrl, httpsUrl = intern.config.fxaContentRoot.replace(/\/$/, '');
 
   if (intern.config.fxaProduction) {
@@ -217,43 +219,47 @@ define([
   var checkedUrlPromises = {};
 
   function checkUrls(origin, urls) {
-    var requests = urls.map(function (url) {
-      if (checkedUrlPromises[url]) {
-        return checkedUrlPromises[url];
-      }
+    return discoverCssResources(urls).then(function (cssResources) {
+      urls = urls.concat(cssResources);
 
-      var requestOptions = {};
-      if (doesURLRequireCORS(url)) {
-        requestOptions = {
-          headers: {
-            'Origin': origin
-          }
-        };
-      }
+      var requests = urls.map(function (url) {
+        if (checkedUrlPromises[url]) {
+          return checkedUrlPromises[url];
+        }
 
-      var promise = makeRequest(url, requestOptions)
-        .then(function (res) {
-          assert.equal(res.statusCode, 200);
+        var requestOptions = {};
+        if (doesURLRequireCORS(url)) {
+          requestOptions = {
+            headers: {
+              'Origin': origin
+            }
+          };
+        }
 
-          var headers = res.headers;
-          var hasCORSHeaders =
-            // Node responds with Access-Control-Allow-Origin,
-            // nginx responds with access-control-allow-origin
-            headers.hasOwnProperty('Access-Control-Allow-Origin') ||
-            headers.hasOwnProperty('access-control-allow-origin');
+        var promise = makeRequest(url, requestOptions)
+          .then(function (res) {
+            assert.equal(res.statusCode, 200);
 
-          if (doesURLRequireCORS(url)) {
-            assert.ok(hasCORSHeaders, url + ' should have CORS headers');
-          } else {
-            assert.notOk(hasCORSHeaders, url + ' should not have CORS headers');
-          }
-        });
+            var headers = res.headers;
+            var hasCORSHeaders =
+              // Node responds with Access-Control-Allow-Origin,
+              // nginx responds with access-control-allow-origin
+              headers.hasOwnProperty('Access-Control-Allow-Origin') ||
+              headers.hasOwnProperty('access-control-allow-origin');
 
-      checkedUrlPromises[url] = promise;
-      return promise;
+            if (doesURLRequireCORS(url)) {
+              assert.ok(hasCORSHeaders, url + ' should have CORS headers');
+            } else {
+              assert.notOk(hasCORSHeaders, url + ' should not have CORS headers');
+            }
+          });
+
+        checkedUrlPromises[url] = promise;
+        return promise;
+      });
+
+      return Promise.all(requests);
     });
-
-    return Promise.all(requests);
   }
 
   function isAbsoluteUrl(url) {
