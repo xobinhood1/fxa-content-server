@@ -72,12 +72,16 @@ define(function (require, exports, module) {
     },
 
     afterRender: function () {
+      // attach events of the descendent view and this view.
+      this.delegateEvents(_.extend({}, FormView.prototype.events, this.events));
+
       // Firefox has a strange issue where if the previous
       // screen was submit using the keyboard, the `enter` key's
       // `keyup` event fires here on the element that receives
       // focus. Without seeding the initial form values, any
       // errors passed from the previous screen are immediately
       // hidden.
+
       this.updateFormValueChanges();
 
       // only enable submit if no error is passed

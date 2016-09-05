@@ -205,6 +205,7 @@ define(function (require, exports, module) {
               this.$el = $('#main-content');
               this.el = this.$el.get(0);
               this.isVisible = true;
+              console.log('not rendering');
             } else {
               self.$el.html(self.template(self.getContext()));
             }
@@ -665,6 +666,11 @@ define(function (require, exports, module) {
      * be displayed, which hides part of the screen.
      */
     focusAutofocusElement () {
+      if (this.isVisible) {
+        // if the view was visible, the autofocus attribute was already set.
+        return;
+      }
+
       // make a huge assumption and say if the device does not have touch,
       // it's a desktop device and autofocus can be applied without
       // hiding part of the view. The no-touch class is added by
