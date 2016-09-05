@@ -117,7 +117,9 @@ define(function (require, exports, module) {
 
             self.setTitle(viewToShow.titleFromView());
 
-            self.writeToDOM(viewToShow.el);
+            if (! viewToShow.isVisible) {
+              self.writeToDOM(viewToShow.el);
+            }
 
             viewToShow.afterVisible();
 
@@ -178,10 +180,12 @@ define(function (require, exports, module) {
 
   });
 
+  /*
   Cocktail.mixin(
     AppView,
     LoadingMixin
   );
+  */
 
   module.exports = AppView;
 });

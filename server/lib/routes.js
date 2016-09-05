@@ -26,6 +26,7 @@ module.exports = function (config, i18n) {
   var routes = [
     require('./routes/get-terms-privacy')(i18n),
     require('./routes/get-index')(config),
+    require('./routes/get-signup')(config),
     require('./routes/get-ver.json'),
     require('./routes/get-client.json')(i18n),
     require('./routes/get-config')(i18n),
@@ -140,7 +141,7 @@ module.exports = function (config, i18n) {
       '/signin',
       '/signin_complete',
       '/signin_permissions',
-      '/signup',
+      //'/signup',
       '/signup_complete',
       '/signup_permissions',
       '/support/create_secure_password',

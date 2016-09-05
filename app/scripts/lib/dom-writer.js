@@ -28,7 +28,7 @@ define(function (require, exports, module) {
       // on view transition. Force them to the top of the page.
       win.scrollTo(0, 0);
 
-      $('#fox-logo').addClass('fade-in-forward').css('opacity', 1);
+      /*$('#fox-logo').addClass('fade-in-forward').css('opacity', 1);*/
     }
   };
 });

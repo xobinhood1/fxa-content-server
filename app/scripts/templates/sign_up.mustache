@@ -1,13 +1,19 @@
 <div id="main-content" class="card">
   <header>
     <h1 id="fxa-signup-header">
-      {{#serviceName}}
+      {{#isSync}}
         <!-- L10N: For languages structured like English, the second phrase can read "to continue to %(serviceName)s" -->
-        {{#t}}Create a Firefox Account{{/t}} <span class="service">{{#t}}Continue to %(serviceName)s{{/t}}</span>
-      {{/serviceName}}
-      {{^serviceName}}
-        {{#t}}Create a Firefox Account{{/t}}
-      {{/serviceName}}
+        {{#t}}Create a Firefox Account{{/t}} <span class="service">{{#t}}Continue to Firefox Sync{{/t}}</span>
+      {{/isSync}}
+      {{^isSync}}
+        {{#serviceName}}
+          <!-- L10N: For languages structured like English, the second phrase can read "to continue to %(serviceName)s" -->
+          {{#t}}Create a Firefox Account{{/t}} <span class="service">{{#t}}Continue to %(serviceName)s{{/t}}</span>
+        {{/serviceName}}
+        {{^serviceName}}
+          {{#t}}Create a Firefox Account{{/t}}
+        {{/serviceName}}
+      {{/isSync}}
     </h1>
   </header>
 
@@ -23,7 +29,7 @@
     {{#showSyncSuggestion}}
       <div class="info nudge pad" id="suggest-sync">{{#t}}Looking for Firefox Sync? <a href="https://mozilla.org/firefox/sync?utm_source=fx-website&utm_medium=fx-accounts&utm_campaign=fx-signup&utm_content=fx-sync-get-started">Get started here</a>{{/t}}</div>
     {{/showSyncSuggestion}}
-    
+
     {{#isSyncMigration}}
       <div class="info nudge" id="sync-migration">{{#t}}Migrate your sync data by creating a new Firefox&nbsp;Account.{{/t}}</div>
     {{/isSyncMigration}}
@@ -53,6 +59,10 @@
       </div>
 
       <div id="coppa">
+        <div class="input-row input-row-age">
+          <label class="label-helper"></label>
+          <input type="number" id="age" placeholder="{{#t}}How old are you?{{/t}}" min="0" max="999" value="{{ age }}" {{#shouldFocusAge}}autofocus{{/shouldFocusAge}} />
+        </div>
       </div>
 
       <div class="extra-links">

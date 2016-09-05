@@ -188,20 +188,26 @@ define(function (require, exports, module) {
         .then(function (isUserAuthorized) {
           return isUserAuthorized && self.beforeRender();
         })
-        .then(function (shouldRender) {
+        .then((shouldRender) => {
           // rendering is opt out.
           if (shouldRender === false) {
             return false;
           }
 
-          return p().then(function () {
+          return p().then(() => {
             self.destroyChildViews();
 
             // force a re-load of the context every time the
             // view is rendered or else stale data may
             // be returned.
             self._context = null;
-            self.$el.html(self.template(self.getContext()));
+            if ($('#' + this.renderId).length) {
+              this.$el = $('#main-content');
+              this.el = this.$el.get(0);
+              this.isVisible = true;
+            } else {
+              self.$el.html(self.template(self.getContext()));
+            }
           })
           .then(_.bind(self.afterRender, self))
           .then(function () {

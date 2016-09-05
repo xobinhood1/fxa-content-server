@@ -41,6 +41,7 @@ define(function (require, exports, module) {
   var View = FormView.extend({
     template: Template,
     className: 'sign-up',
+    renderId: 'fxa-signup-header',
 
     initialize: function (options) {
       options = options || {};
