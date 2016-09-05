@@ -13,6 +13,7 @@
 // (requirejs, minification, revving).
 
 module.exports = function (grunt) {
+  var fs = require('fs');
   var path = require('path');
   var Handlebars = require('handlebars');
   var Promise = require('bluebird');
@@ -23,9 +24,14 @@ module.exports = function (grunt) {
   var templateDest;
 
   var PROPAGATED_ESCAPED_TEMPLATE_FIELDS = [
-    'flowId',
     'flowBeginTime',
-    'message'
+    'flowId',
+    'isEmailOptInVisible',
+    'isSignInEnabled',
+    'isSync',
+    'message',
+    'shouldFocusEmail',
+    'staticResourceUrl'
   ];
   var PROPAGATED_UNSAFE_TEMPLATE_FIELDS = [
     'staticResourceUrl'
@@ -47,6 +53,9 @@ module.exports = function (grunt) {
       return this.l10n.format(this.l10n.gettext(string), this);
     }
   });
+
+  var SIGN_UP_PARTIAL = fs.readFileSync(path.join(__dirname, '..', 'app', 'scripts', 'templates', 'sign_up.mustache')).toString();
+  Handlebars.registerPartial('mainContent', SIGN_UP_PARTIAL);
 
   grunt.registerTask('l10n-generate-pages', ['l10n-create-json', 'l10n-generate-tos-pp', 'l10n-compile-templates']);
 
@@ -118,7 +127,11 @@ module.exports = function (grunt) {
       process: function (contents) {
         var terms = legalTemplates[context.lang].terms || legalTemplates[defaultLegalLang].terms;
         var privacy = legalTemplates[context.lang].privacy || legalTemplates[defaultLegalLang].privacy;
-        var template = Handlebars.compile(contents);
+        try {
+          var template = Handlebars.compile(contents);
+        } catch (e) {
+          grunt.log.error('Error', String(e));
+        }
         var data = {
           fontSupportDisabled: context.fontSupportDisabled,
           l10n: context,
@@ -136,7 +149,11 @@ module.exports = function (grunt) {
         PROPAGATED_UNSAFE_TEMPLATE_FIELDS.forEach(function (field) {
           data[field] = '{{{' + field + '}}}';
         });
-        return template(data);
+        try {
+          return template(data);
+        } catch(e) {
+          grunt.log.error('Error', String(e));
+        }
       }
     });
   }
