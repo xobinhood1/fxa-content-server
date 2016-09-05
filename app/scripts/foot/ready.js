@@ -1,5 +1,5 @@
 (function () {
-  let totalTime = Date.now() - window.performance.timing.requestStart;
+  var totalTime = Date.now() - window.performance.timing.requestStart;
   console.log('total time', totalTime);
 
   if (document.location.search && window.top !== window && window.name !== 'remote') {
