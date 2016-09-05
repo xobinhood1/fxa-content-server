@@ -17,7 +17,7 @@ module.exports = function (grunt) {
         'tag-name-lowercase': true,
         'tag-name-match': true
       },
-      src: ['<%= yeoman.page_template_dist %>/*/*.html']
+      src: ['<%= yeoman.page_template_dist %>/*.html']
     },
     l10n: {
       options: { htmllintrc: '.htmllintrc' },

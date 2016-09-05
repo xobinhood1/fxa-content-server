@@ -18,12 +18,12 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.page_template_dist %>',
         dest: '<%= yeoman.page_template_dist %>',
         src: [
-          '**/*.html',
+          '*.html',
           // The 502 and 503 pages are served by nginx and cannot do
           // variable interpolation to replace staticResourceUrl with
           // the FQDN.
-          '!**/502.html',
-          '!**/503.html'
+          '!502.html',
+          '!503.html'
         ]
       }
     });

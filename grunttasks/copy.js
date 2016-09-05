@@ -68,6 +68,7 @@ module.exports = function (grunt) {
         }
       ]
     },
+    /*
     error_pages: { //eslint-disable-line camelcase
       files: [{
         cwd: '<%= yeoman.page_template_dist %>',
@@ -75,9 +76,10 @@ module.exports = function (grunt) {
         dot: true,
         expand: true,
         flatten: true,
-        src: 'en/{500,502,503}.html'
+        src: '{500,502,503}.html'
       }]
     },
+    */
     head: {
       files: [{
         cwd: '<%= yeoman.tmp %>/concat/scripts',
@@ -127,6 +129,13 @@ module.exports = function (grunt) {
       dot: true,
       expand: true,
       src: '{,*/}*.css'
+    },
+    templates: {
+      cwd: '<%= yeoman.page_template_src %>',
+      dest: '<%= yeoman.page_template_dist %>/',
+      dot: true,
+      expand: true,
+      src: '*.html'
     },
     tos_pp: { //eslint-disable-line camelcase
       // The legal repo use es-ES but we (in accordance with Verbatim) use es,

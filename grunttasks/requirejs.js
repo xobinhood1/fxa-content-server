@@ -18,7 +18,7 @@ module.exports = function (grunt) {
         // http://requirejs.org/docs/errors.html#sourcemapcomments
         preserveLicenseComments: false,
         replaceRequireScript: [{
-          files: ['<%= yeoman.page_template_dist %>/{,*/}index.html'],
+          files: ['<%= yeoman.page_template_dist %>/index.html'],
           module: 'main',
           modulePath: '/scripts/main'
         }],

@@ -107,7 +107,7 @@ module.exports = function (grunt) {
     },
     dist: { //eslint-disable-line sorting/sort-object-props
       src: [
-        '<%= yeoman.page_template_dist %>/**/*.html'
+        '<%= yeoman.page_template_dist %>/*.html'
       ]
     }
   });

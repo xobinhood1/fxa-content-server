@@ -15,10 +15,12 @@ module.exports = function (grunt) {
     // the list of resources to minimize. Generated pages are placed into
     // `server/templates/pages/dist` where they will be post-processed
     // with requirejs and usemin
-    'l10n-generate-pages',
+    //'l10n-generate-pages',
+    'copy:templates',
 
     // prepares the configuration to transform specific blocks
-    // in the scrutinized file into a single line, targeting an optimized version of the files.
+    // in the scrutinized file into a single line, targeting an
+    // optimized version of the files.
     'useminPrepare',
 
     // Compile ES2015 to ES5
@@ -82,6 +84,6 @@ module.exports = function (grunt) {
 
     // use error pages from en as the static error pages. Comes last
     // to ensure static resources are loaded using cache busting URLs
-    'copy:error_pages'
+    //'copy:error_pages'
   ]);
 };

@@ -26,6 +26,7 @@ module.exports = function (config) {
   }
 
   return function (req, res, next) {
+    /*
     if (useLocalizedTemplates) {
       var _render = res.render;
       res.render = function (_template, args) {
@@ -33,6 +34,7 @@ module.exports = function (config) {
         return _render.call(res, template, args);
       };
     }
+    */
 
     next();
   };
