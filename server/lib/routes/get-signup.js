@@ -18,22 +18,24 @@ module.exports = function (config) {
   route.method = 'get';
   route.path = '/signup';
 
+  Handlebars.registerPartial('signUpContent', SIGN_UP_PARTIAL);
+
   route.process = function (req, res) {
     var flowEventData = flowMetrics(FLOW_ID_KEY, req.headers['user-agent']);
+    var isSync = req.query.service === 'sync';
 
-    Handlebars.registerPartial('mainContent', SIGN_UP_PARTIAL);
     res.render('index', {
       flowBeginTime: flowEventData.flowBeginTime,
       flowId: flowEventData.flowId,
-      isEmailOptInVisible: true,
+      isEmailOptInVisible: isSync,
       isSignInEnabled: true,
       // Note that staticResourceUrl is added to templates as a build step
-      isSync: true,
+      isSync: isSync,
+      isSignUp: true,
       shouldFocusEmail: true,
       staticResourceUrl: STATIC_RESOURCE_URL
     });
   };
-  Handlebars.unregisterPartial('mainContent');
 
   return route;
 };

@@ -35,10 +35,14 @@
         <![endif]-->
     </head>
     <body data-flow-id="{{flowId}}" data-flow-begin="{{flowBeginTime}}" data-static-resource-host="{{{staticResourceUrl}}}">
-        <div id="fox-logo" class="fade-in-forward"></div>
-        <!--div id="loading-spinner" class="spinner"></div-->
+      <div id="fox-logo" {{#isSignUp}}class="fade-in-forward"{{/isSignUp}}></div>
+        {{^isSignUp}}
+          <div id="loading-spinner" class="spinner"></div>
+        {{/isSignUp}}
         <div id="stage">
-          {{> mainContent }}
+          {{#isSignUp}}
+            {{> signUpContent }}
+          {{/isSignUp}}
         </div>
 
         <a id="about-mozilla" rel="author" target="_blank" href="https://www.mozilla.org/about/?utm_source=firefox-accounts&amp;utm_medium=Referral"></a>

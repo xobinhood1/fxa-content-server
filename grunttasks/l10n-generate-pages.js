@@ -28,6 +28,7 @@ module.exports = function (grunt) {
     'flowId',
     'isEmailOptInVisible',
     'isSignInEnabled',
+    //'isSignUp',
     'isSync',
     'message',
     'shouldFocusEmail',
@@ -55,7 +56,7 @@ module.exports = function (grunt) {
   });
 
   var SIGN_UP_PARTIAL = fs.readFileSync(path.join(__dirname, '..', 'app', 'scripts', 'templates', 'sign_up.mustache')).toString();
-  Handlebars.registerPartial('mainContent', SIGN_UP_PARTIAL);
+  Handlebars.registerPartial('signUpContent', SIGN_UP_PARTIAL);
 
   grunt.registerTask('l10n-generate-pages', ['l10n-create-json', 'l10n-generate-tos-pp', 'l10n-compile-templates']);
 
