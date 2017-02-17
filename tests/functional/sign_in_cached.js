@@ -6,8 +6,7 @@ define([
   'intern',
   'intern!object',
   'tests/lib/helpers',
-  'tests/functional/lib/helpers',
-  'app/scripts/lib/constants'
+  'tests/functional/lib/helpers'
 ], function (intern, registerSuite, TestHelpers,
   FunctionalHelpers) {
 
