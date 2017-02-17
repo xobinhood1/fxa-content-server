@@ -9,7 +9,7 @@ define([
   'tests/functional/lib/helpers',
   'app/scripts/lib/constants'
 ], function (intern, registerSuite, TestHelpers,
-  FunctionalHelpers, Constants) {
+  FunctionalHelpers) {
 
   var config = intern.config;
 
