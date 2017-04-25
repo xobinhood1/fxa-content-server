@@ -35,8 +35,8 @@ test:
 # appropriately tag and push the container to dockerhub
 deployment:
   hub_latest:
-    # push all branches, they are used by fxa-dev
-    branch: /.*/
+    # push master, or any branch beginning with 'feature' or 'dockerpush'
+    branch: /^(master|feature.*|dockerpush.*)$/
     commands:
       - "[ ! -z $DOCKERHUB_REPO ]"
       - git clean -dffx
