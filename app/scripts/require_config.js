@@ -84,6 +84,9 @@ require.config({
     moment: '../bower_components/moment/moment',
     mustache: '../bower_components/mustache/mustache',
     'p-promise': '../bower_components/p/p',
+    'qrcode-generator': '../bower_components/qrcode.js/qrcode',
+    'qrcode-reader': '../bower_components/html5.qrcode/lib/jsqrcode-combined.min',
+    'qrcode-reader-jq': '../bower_components/html5.qrcode/lib/html5-qrcode.min',
     raven: '../bower_components/raven-js/dist/raven',
     sinon: '../bower_components/sinon/lib/sinon',
     speedTrap: '../bower_components/speed-trap/dist/speed-trap',
@@ -110,6 +113,12 @@ require.config({
     modal: {
       deps: ['jquery'],
       exports: 'modal'
+    },
+    'qrcode-generator': {
+      exports: 'QRCode'
+    },
+    'qrcode-reader': {
+      exports: 'qrcode'
     },
     sinon: {
       exports: 'sinon'

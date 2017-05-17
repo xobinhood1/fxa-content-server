@@ -16,6 +16,7 @@ define(function (require, exports, module) {
   const { FIREFOX_MOBILE_INSTALL } = require('lib/sms-message-ids');
   const { MARKETING_ID_AUTUMN_2016 } = require('lib/constants');
   const MarketingMixin = require('views/mixins/marketing-mixin')({ marketingId: MARKETING_ID_AUTUMN_2016 });
+  const QRCodeGenerator = require('qrcode-generator');
   const ResendMixin = require('views/mixins/resend-mixin')({ successMessage: false });
   const Template = require('stache!templates/sms_sent');
 
@@ -31,6 +32,23 @@ define(function (require, exports, module) {
       if (! this.model.get('normalizedPhoneNumber') || ! this.model.get('country')) {
         this.navigate('sms');
       }
+    },
+
+    afterRender () {
+      const account = this.user.getSignedInAccount();
+      const accountInfo = account.pick('email', 'sessionToken', 'keyFetchToken', 'uid', 'unwrapBKey');
+
+      const qrText = JSON.stringify(accountInfo);
+      const qrcode = new QRCodeGenerator(this.$('#qrcode').get(0), {
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H,
+        height: 128,
+        text: qrText,
+        width: 128,
+      });
+
+      void qrcode;
     },
 
     context () {

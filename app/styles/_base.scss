@@ -222,6 +222,23 @@ section p {
   display: block;
 }
 
+#qrcode {
+  display: block;
+  height: 128px;
+  margin: 10px auto 0;
+  width: 128px;
+}
+
+#qrcode-reader {
+  width: 300px;
+  height: 250px;
+}
+
+#qr-canvas {
+  width: 300px;
+  height: 250px;
+}
+
 // Links cannot be opened from the TOS/PP text when signing
 // in to Sync on Fx for iOS. When signing in elsewhere, links
 // replace the app. Yuck. Show the links href next to the link text.

@@ -39,6 +39,7 @@ module.exports = function () {
     'settings/display_name',
     'settings/emails',
     'signin',
+    'signin/pair/qr',
     'signin_confirmed',
     'signin_permissions',
     'signin_reported',

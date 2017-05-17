@@ -31,6 +31,7 @@ define(function (require, exports, module) {
   const IndexView = require('../views/index');
   const LegalView = require('../views/legal');
   const OAuthIndexView = require('../views/oauth_index');
+  const PairQRView = require('../views/pair-qr');
   const PermissionsView = require('../views/permissions');
   const PpView = require('../views/pp');
   const ReadyView = require('../views/ready');
@@ -103,6 +104,7 @@ define(function (require, exports, module) {
       'settings/display_name(/)': createChildViewHandler(DisplayNameView, SettingsView),
       'settings/emails(/)': createChildViewHandler(EmailsView, SettingsView),
       'signin(/)': createViewHandler(SignInView),
+      'signin/pair/qr': createViewHandler(PairQRView),
       'signin_confirmed(/)': createViewHandler(ReadyView, { type: VerificationReasons.SIGN_IN }),
       'signin_permissions(/)': createViewHandler(PermissionsView, { type: VerificationReasons.SIGN_IN }),
       'signin_reported(/)': createViewHandler(SignInReportedView),
