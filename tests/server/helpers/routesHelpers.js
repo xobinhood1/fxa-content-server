@@ -12,9 +12,10 @@ define([
   'intern/dojo/node!got',
   'intern/dojo/node!url',
   'intern/browser_modules/dojo/Promise',
-  'intern/dojo/node!fxa-shared'
+  'intern/dojo/node!fxa-shared',
+  'intern/dojo/node!../lib/discover-css-resources'
 ], function (intern, registerSuite, assert, config, csp,
-  htmlparser2, got, url, Promise, fxaShared) {
+  htmlparser2, got, url, Promise, fxaShared, discoverCssResources) {
 
   var httpUrl, httpsUrl = intern.config.fxaContentRoot.replace(/\/$/, '');
 
@@ -92,49 +93,53 @@ define([
   var checkedUrlPromises = {};
 
   function checkUrls(origin, urls) {
-    var requests = urls.map(function (url) {
-      if (checkedUrlPromises[url]) {
-        return checkedUrlPromises[url];
-      }
+    return discoverCssResources(urls).then(function (cssResources) {
+      urls = urls.concat(cssResources);
 
-      var requestOptions = {};
-      if (doesURLRequireCORS(url)) {
-        requestOptions = {
-          headers: {
-            'Origin': origin
-          }
-        };
-      }
+      var requests = urls.map(function (url) {
+        if (checkedUrlPromises[url]) {
+          return checkedUrlPromises[url];
+        }
 
-      var promise = makeRequest(url, requestOptions)
-        .then(function (res) {
-          if (/support.mozilla.org/.test(url) || /localhost:35729/.test(url)) {
-            // Do not check support.mozilla.org URLs. Issue #4712
-            // In February 2017 SUMO links started returning 404s to non-browser redirect requests
-            // Also skip the livereload link in the mocha tests
-            return;
-          }
-          assert.equal(res.statusCode, 200);
+        var requestOptions = {};
+        if (doesURLRequireCORS(url)) {
+          requestOptions = {
+            headers: {
+              'Origin': origin
+            }
+          };
+        }
 
-          var headers = res.headers;
-          var hasCORSHeaders =
-            // Node responds with Access-Control-Allow-Origin,
-            // nginx responds with access-control-allow-origin
-            headers.hasOwnProperty('Access-Control-Allow-Origin') ||
-            headers.hasOwnProperty('access-control-allow-origin');
+        var promise = makeRequest(url, requestOptions)
+          .then(function (res) {
+            if (/support.mozilla.org/.test(url) || /localhost:35729/.test(url)) {
+              // Do not check support.mozilla.org URLs. Issue #4712
+              // In February 2017 SUMO links started returning 404s to non-browser redirect requests
+              // Also skip the livereload link in the mocha tests
+              return;
+            }
+            assert.equal(res.statusCode, 200);
 
-          if (doesURLRequireCORS(url)) {
-            assert.ok(hasCORSHeaders, url + ' should have CORS headers');
-          } else {
-            assert.notOk(hasCORSHeaders, url + ' should not have CORS headers');
-          }
-        });
+            var headers = res.headers;
+            var hasCORSHeaders =
+              // Node responds with Access-Control-Allow-Origin,
+              // nginx responds with access-control-allow-origin
+              headers.hasOwnProperty('Access-Control-Allow-Origin') ||
+              headers.hasOwnProperty('access-control-allow-origin');
 
-      checkedUrlPromises[url] = promise;
-      return promise;
+            if (doesURLRequireCORS(url)) {
+              assert.ok(hasCORSHeaders, url + ' should have CORS headers');
+            } else {
+              assert.notOk(hasCORSHeaders, url + ' should not have CORS headers');
+            }
+          });
+
+        checkedUrlPromises[url] = promise;
+        return promise;
+      });
+
+      return Promise.all(requests);
     });
-
-    return Promise.all(requests);
   }
 
   function isAbsoluteUrl(url) {
