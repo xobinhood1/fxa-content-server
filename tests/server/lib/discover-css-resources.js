@@ -63,17 +63,13 @@ function extractCssUrls(uri) {
 
   return new Promise(function (resolve, reject) {
     console.log('css:  kicking off request for', uri);
-    got(uri, options, function (err, res, body) {
-      if (err) {
+    return got(uri, options)
+      .then((response) => {
+        return resolve(parseCssUrls(body, uri));
+      })
+      .catch((err) => {
         return reject(err);
-      }
-
-      if (res.statusCode !== 200) {
-        return reject(new Error('Non-200 response ' + res.statusCode));
-      }
-
-      return resolve(parseCssUrls(body, uri));
-    });
+      })
   });
 }
 
