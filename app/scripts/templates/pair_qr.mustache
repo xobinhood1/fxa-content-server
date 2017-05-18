@@ -1,6 +1,8 @@
 <div id="main-content" class="card">
   <header>
     <h1 id="fxa-pair-header">
+      Scan the QR code
+
       {{#serviceName}}
         <!-- L10N: For languages structured like English, the second phrase can read "to continue to %(serviceName)s" -->
         {{ headerSignInText }} <span class="service">{{#t}}Continue to %(serviceName)s{{/t}}</span>
@@ -12,7 +14,6 @@
   </header>
 
   <section>
-    Pairing flow!
     <div id="qrcode-reader"></div>
   </section>
 </div>

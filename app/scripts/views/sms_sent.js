@@ -36,16 +36,17 @@ define(function (require, exports, module) {
 
     afterRender () {
       const account = this.user.getSignedInAccount();
-      const accountInfo = account.pick('email', 'sessionToken', 'keyFetchToken', 'uid', 'unwrapBKey');
+      const accountInfo = account.pick('email');//, 'sessionToken', 'keyFetchToken', 'uid', 'unwrapBKey');
+      accountInfo.password = 'testuser';
 
       const qrText = JSON.stringify(accountInfo);
       const qrcode = new QRCodeGenerator(this.$('#qrcode').get(0), {
         colorDark: '#000000',
         colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H,
-        height: 128,
+        correctLevel: window.QRCode.CorrectLevel.H,
+        height: 225,
         text: qrText,
-        width: 128,
+        width: 225,
       });
 
       void qrcode;

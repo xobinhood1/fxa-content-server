@@ -224,19 +224,21 @@ section p {
 
 #qrcode {
   display: block;
-  height: 128px;
+  height: 225px;
   margin: 10px auto 0;
-  width: 128px;
+  width: 225px;
 }
 
 #qrcode-reader {
   width: 300px;
   height: 250px;
+  margin: 0 auto;
 }
 
 #qr-canvas {
   width: 300px;
   height: 250px;
+  display: none;
 }
 
 // Links cannot be opened from the TOS/PP text when signing
