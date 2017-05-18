@@ -11,7 +11,7 @@ var url = require('url');
 var css = require('css');
 var extend = require('extend');
 var Promise = require('bluebird');
-var request = require('request');
+var got = require('got');
 
 var CSSURL_RE = /url\(\s*['"]?([^)'"]+)['"]?\s*\)/g;
 
@@ -63,7 +63,7 @@ function extractCssUrls(uri) {
 
   return new Promise(function (resolve, reject) {
     console.log('css:  kicking off request for', uri);
-    request(uri, options, function (err, res, body) {
+    got(uri, options, function (err, res, body) {
       if (err) {
         return reject(err);
       }
