@@ -52,7 +52,7 @@ define([
     return algorithm + '-' + sri;
   }
 
-  function isProductionLike() { 
+  function isProductionLike() {
     return intern.config.fxaProduction && intern.config.fxaDevBox;
   }
 
