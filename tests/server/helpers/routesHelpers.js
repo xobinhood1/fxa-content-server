@@ -52,6 +52,10 @@ define([
     return algorithm + '-' + sri;
   }
 
+  function isProductionLike() { 
+    return intern.config.fxaProduction && intern.config.fxaDevBox;
+  }
+
   function makeRequest(url, requestOptions) {
     return got(url, requestOptions)
       .catch(function (err) {
@@ -100,17 +104,14 @@ define([
             return;
           }
 
-          var resource;
+          const resource = {
+            integrity: attribs.integrity || null
+          };
+
           if (tagname === 'script') {
-            resource = {
-              integrity: attribs.integrity || null,
-              url: attribs.src
-            };
+            resource.url = attribs.src;
           } else if (tagname === 'link' || tagname === 'a') {
-            resource = {
-              integrity: attribs.integrity || null,
-              url: attribs.href
-            };
+            resource.url = attribs.href;
           }
 
           if (! resource) {
@@ -129,17 +130,8 @@ define([
         },
 
         onend: function onend() {
-          // On a second pass, processing IE comments, we should find no more comments.
-          if (comments.length > 0) {
-            var commentContent = comments.join('\n');
-            comments = []; // reset
-            // I'm a little concerned if it's really ok to call `parser.write`
-            // from within the `onend` handler. But seems to work correctly.
-            parser.write(commentContent);
-            parser.end();
-          } else {
-            resolve(dependencyResources);
-          }
+          // TODO: could scan the accumulated comments for IE-style resource links.
+          resolve(dependencyResources);
         }
       };
 
@@ -185,13 +177,14 @@ define([
 
               assert.equal(res.statusCode, 200);
 
-              // Check all CSS and JS (except experiments.bundle.js) for SRI
-              // `integrity=` attribute on the link, and that the checksum of the
-              // returned content matches.
-              if (isJsOrCss(resource.url) && ! /experiments\.bundle\.js$/.test(resource.url)) {
+              // If prod-like, Check all CSS and JS (except experiments.bundle.js)
+              // for SRI `integrity=` attribute on the link, and that the checksum
+              // of the returned content matches.
+              if (isProductionLike() && isJsOrCss(resource.url) &&
+                  ! /experiments\.bundle\.js$/.test(resource.url)) {
                 assert.ok(resource.integrity, 'JS/CSS link has SRI integrity attribute');
-                const algorithm = resource.integrity.split('-')[0];
-                const computedSri = computeSri(algorithm, res.body);
+                var algorithm = resource.integrity.split('-')[0];
+                var computedSri = computeSri(algorithm, res.body);
                 assert.equal(resource.integrity, computedSri, 'SRI attribute integrity matches downloaded content');
               }
 
