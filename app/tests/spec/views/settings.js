@@ -301,7 +301,7 @@ define(function (require, exports, module) {
       });
 
       it('has no avatar set', function () {
-        sinon.stub(account, 'getAvatar', function () {
+        sinon.stub(account, 'getProfile', function () {
           return p({});
         });
 
@@ -316,8 +316,8 @@ define(function (require, exports, module) {
       });
 
       it('has avatar but does not load', function () {
-        sinon.stub(account, 'getAvatar', function () {
-          return p({ avatar: 'blah.jpg', id: 'foo' });
+        sinon.stub(account, 'getProfile', function () {
+          return p({ avatar: 'blah.jpg' });
         });
 
         return view.render()
@@ -336,10 +336,9 @@ define(function (require, exports, module) {
 
       it('has an avatar set', function () {
         var url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==';
-        var id = 'foo';
 
-        sinon.stub(account, 'getAvatar', function () {
-          return p({ avatar: url, id: id });
+        sinon.stub(account, 'getProfile', function () {
+          return p({ avatar: url });
         });
 
         return view.render()

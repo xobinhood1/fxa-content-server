@@ -84,8 +84,8 @@ define(function (require, exports, module) {
           email: 'a@a.com',
           verified: true
         });
-        sinon.stub(account, 'getAvatar', function () {
-          return p({ avatar: pngSrc, id: 'foo' });
+        sinon.stub(account, 'getProfile', function () {
+          return p({ avatar: pngSrc });
         });
         sinon.stub(account, 'profileClient', function () {
           return p(profileClientMock);
@@ -226,9 +226,9 @@ define(function (require, exports, module) {
       it('properly tracks avatar new events', function (done) {
         view.FileReader = FileReaderMock;
 
-        account.getAvatar.restore();
-        sinon.stub(account, 'getAvatar', function () {
-          return p({ avatar: pngSrc, id: null });
+        account.getProfile.restore();
+        sinon.stub(account, 'getProfile', function () {
+          return p({ avatar: pngSrc });
         });
 
         view.afterVisible()

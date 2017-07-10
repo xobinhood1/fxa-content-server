@@ -36,7 +36,6 @@ define(function (require, exports, module) {
     needsOptedInToMarketingEmail: undefined,
     // password field intentionally omitted to avoid unintentional leaks
     permissions: undefined,
-    profileImageId: undefined,
     profileImageUrl: undefined,
     sessionToken: undefined,
     // Hint for future code spelunkers. sessionTokenContext is a misnomer,
@@ -364,7 +363,6 @@ define(function (require, exports, module) {
 
     setProfileImage (profileImage) {
       this.set({
-        profileImageId: profileImage.get('id'),
         profileImageUrl: profileImage.get('url')
       });
 
@@ -379,9 +377,11 @@ define(function (require, exports, module) {
       // if any data is set outside of the `fetchProfile` function,
       // clear the cache and force a reload of the profile the next time.
       delete this._profileFetchPromise;
+      delete this._profileImage;
     },
 
     _profileFetchPromise: null,
+    _profileImage: null,
     fetchProfile () {
       // Avoid multiple views making profile requests by caching
       // the profile fetch request. Only allow one for a given account,
@@ -398,6 +398,7 @@ define(function (require, exports, module) {
       this._profileFetchPromise = this.getProfile()
         .then((result) => {
           var profileImage = new ProfileImage({ url: result.avatar });
+          this._profileImage = profileImage;
 
           this.setProfileImage(profileImage);
           this.set('displayName', result.displayName);
@@ -409,15 +410,13 @@ define(function (require, exports, module) {
     },
 
     fetchCurrentProfileImage () {
-      var profileImage = new ProfileImage();
-
-      return this.getAvatar()
-        .then((result) => {
-          profileImage = new ProfileImage({ id: result.id, url: result.avatar });
-          this.setProfileImage(profileImage);
-          return profileImage.fetch();
-        })
-        .then(() => profileImage);
+      // piggyback on any existing profile fetch request
+      return this.fetchProfile()
+        .then(() => {
+          var profileImage = this._profileImage;
+          return profileImage.fetch()
+            .then(() => profileImage);
+        });
     },
 
     /**

@@ -225,7 +225,7 @@ define(function (require, exports, module) {
             return view.deleteDisplayedAccountProfileImage(account);
           })
           .then(function () {
-            assert.isTrue(account.deleteAvatar.calledWith('foo'));
+            assert.isTrue(account.deleteAvatar.called);
             assert.isFalse(account.has('profileImageUrl'));
             assert.isTrue(user.setAccount.calledWith(account));
             assert.isTrue(notifier.trigger.calledWith(Notifier.PROFILE_CHANGE, { uid: UID }));

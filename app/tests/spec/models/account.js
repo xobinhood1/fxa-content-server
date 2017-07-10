@@ -1008,14 +1008,13 @@ define(function (require, exports, module) {
         });
 
         it('delete an avatar', function () {
-          var ID = 'deadbeef';
           sinon.stub(profileClient, 'deleteAvatar', function () {
             return p();
           });
 
-          return account.deleteAvatar(ID)
+          return account.deleteAvatar()
             .then(function () {
-              assert.isTrue(profileClient.deleteAvatar.calledWith(accessToken, ID));
+              assert.isTrue(profileClient.deleteAvatar.calledWith(accessToken));
             });
         });
 
@@ -1421,8 +1420,8 @@ define(function (require, exports, module) {
 
     describe('fetchCurrentProfileImage', function () {
       it('returns profile image', function () {
-        sinon.stub(account, 'getAvatar', function () {
-          return p({ avatar: PNG_URL, id: 'foo' });
+        sinon.stub(account, 'getProfile', function () {
+          return p({ avatar: PNG_URL, displayName: name });
         });
 
         sinon.spy(account, 'setProfileImage');
@@ -1430,7 +1429,6 @@ define(function (require, exports, module) {
         return account.fetchCurrentProfileImage()
           .then(function (profileImage) {
             assert.equal(profileImage.get('url'), PNG_URL);
-            assert.equal(profileImage.get('id'), 'foo');
             assert.isTrue(profileImage.has('img'));
             assert.isTrue(account.get('hadProfileImageSetBefore'));
             assert.isTrue(account.setProfileImage.calledWith(profileImage));
@@ -1438,7 +1436,7 @@ define(function (require, exports, module) {
       });
 
       it('errors on getAvatar returns error', function () {
-        sinon.stub(account, 'getAvatar', function () {
+        sinon.stub(account, 'getProfile', function () {
           return p.reject(ProfileErrors.toError('UNAUTHORIZED'));
         });
 
@@ -1451,8 +1449,8 @@ define(function (require, exports, module) {
       });
 
       it('errors on profileImage fetch returns error', function () {
-        sinon.stub(account, 'getAvatar', function () {
-          return p({ avatar: 'bad url', id: 'foo' });
+        sinon.stub(account, 'getProfile', function () {
+          return p({ avatar: 'bad url' });
         });
 
         return account.fetchCurrentProfileImage()

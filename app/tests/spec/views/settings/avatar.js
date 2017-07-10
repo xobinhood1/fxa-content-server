@@ -64,7 +64,7 @@ define(function (require, exports, module) {
       });
 
       it('has no avatar set', function () {
-        sinon.stub(account, 'getAvatar', function () {
+        sinon.stub(account, 'getProfile', function () {
           return p({});
         });
 

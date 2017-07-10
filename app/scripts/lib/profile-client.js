@@ -45,8 +45,8 @@ define(function (require, exports, module) {
     return this._request('/v1/avatar', 'get', accessToken);
   };
 
-  ProfileClient.prototype.deleteAvatar = function (accessToken, id) {
-    return this._request('/v1/avatar/' + id, 'delete', accessToken);
+  ProfileClient.prototype.deleteAvatar = function (accessToken) {
+    return this._request('/v1/avatar', 'delete', accessToken);
   };
 
   ProfileClient.prototype.uploadAvatar = function (accessToken, data) {

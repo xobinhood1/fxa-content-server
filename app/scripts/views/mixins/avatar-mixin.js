@@ -160,7 +160,7 @@ define(function (require, exports, module) {
     deleteDisplayedAccountProfileImage (account) {
       return p()
         .then(() => {
-          if (! account.get('profileImageId')) {
+          if (! account.get('profileImageUrl')) {
             return account.fetchCurrentProfileImage()
               .then((profileImage) => {
                 // Cache the result to make sure we don't flash the default
@@ -169,10 +169,10 @@ define(function (require, exports, module) {
                 return profileImage;
               });
           }
-          // if we reach here, the account has a profile image ID already.
+          // if we reach here, the account has a profile image already.
         })
-        // if we reach here, the account will have an avatar and a profileImageId
-        .then((profileImage) => account.deleteAvatar(account.get('profileImageId')))
+        // if we reach here, the account will have an avatar and a profileImage
+        .then((profileImage) => account.deleteAvatar())
         .then(() => {
           // A blank image will clear the cache
           this.updateProfileImage(new ProfileImage(), account);
