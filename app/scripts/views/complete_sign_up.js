@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * Complete sign up is used to complete the email verification for one
- * of three types of users:
+ * Complete sign up is used to complete the email verification for
+ * multiple types of users:
  *
  * 1. New users that just signed up.
  * 2. Existing users that have signed in with an unverified account.
@@ -165,6 +165,8 @@ define(function (require, exports, module) {
           // or are verifying in a different tab. Show the "Account
           // verified!" screen to the user, the correct tab will have
           // already transitioned back to the relier.
+          // If a Sync user makes it here, another user is signed in and
+          // they are ineligible for CAD.
           this._navigateToVerifiedScreen();
         } else {
           return account.isSignedIn()

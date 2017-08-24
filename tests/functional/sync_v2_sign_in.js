@@ -6,8 +6,9 @@ define([
   'intern',
   'intern!object',
   'tests/lib/helpers',
-  'tests/functional/lib/helpers'
-], function (intern, registerSuite, TestHelpers, FunctionalHelpers) {
+  'tests/functional/lib/helpers',
+  'tests/functional/lib/selectors'
+], function (intern, registerSuite, TestHelpers, FunctionalHelpers, selectors) {
   var config = intern.config;
   var PAGE_URL = config.fxaContentRoot + 'signin?context=fx_desktop_v2&service=sync&forceAboutAccounts=true';
 
@@ -34,14 +35,14 @@ define([
     const signInEmail = options.signInEmail || email;
     const signUpEmail = options.signUpEmail || email;
 
-    const successSelector = options.blocked ? '#fxa-signin-unblock-header' :
-                            options.preVerified ? '#fxa-confirm-signin-header' :
-                            '#fxa-confirm-header';
+    const successSelector = options.blocked ? selectors.SIGNIN_UNBLOCK.HEADER :
+                            options.preVerified ? selectors.CONFIRM_SIGNIN.HEADER :
+                            selectors.CONFIRM_SIGNUP.HEADER;
 
     return this.parent
       .then(clearBrowserState({ force: true }))
       .then(createUser(signUpEmail, PASSWORD, { preVerified: options.preVerified }))
-      .then(openPage(PAGE_URL, '#fxa-signin-header'))
+      .then(openPage(PAGE_URL, selectors.SIGNIN.HEADER))
       .then(respondToWebChannelMessage('fxaccounts:can_link_account', { ok: true } ))
       .then(fillOutSignIn(signInEmail, PASSWORD))
       .then(testElementExists(successSelector))
@@ -67,11 +68,11 @@ define([
 
         .then(openVerificationLinkInNewTab(email, 0))
         .switchToWindow('newwindow')
-          .then(testElementExists('#fxa-sign-in-complete-header'))
+          .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
 
         // about:accounts will take over post-verification, no transition
-        .then(noPageTransition('#fxa-confirm-signin-header'));
+        .then(noPageTransition(selectors.CONFIRM_SIGNIN.HEADER));
     },
 
     'verified, verify different browser - from original tab\'s P.O.V.': function () {
@@ -81,7 +82,7 @@ define([
         .then(openVerificationLinkInDifferentBrowser(email))
 
         // about:accounts will take over post-verification, no transition
-        .then(noPageTransition('#fxa-confirm-signin-header'));
+        .then(noPageTransition(selectors.CONFIRM_SIGNIN.HEADER));
     },
 
     'unverified': function () {
@@ -98,7 +99,7 @@ define([
         .then(fillOutSignInUnblock(email, 0))
 
         // about:accounts will take over post-verification, no transition
-        .then(noPageTransition('#fxa-signin-unblock-header'))
+        .then(noPageTransition(selectors.SIGNIN_UNBLOCK.HEADER))
         .then(testIsBrowserNotified('fxaccounts:login'));
     },
 
@@ -122,7 +123,7 @@ define([
         .then(fillOutSignInUnblock(signUpEmail, 0))
 
         // about:accounts will take over post-verification, no transition
-        .then(noPageTransition('#fxa-signin-unblock-header'))
+        .then(noPageTransition(selectors.SIGNIN_UNBLOCK.HEADER))
         .then(testIsBrowserNotified('fxaccounts:login'));
     }
   });

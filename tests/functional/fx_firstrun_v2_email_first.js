@@ -40,6 +40,7 @@ define([
       return this.remote
         .then(clearBrowserState({ force: true }));
     },
+
     'signup': function () {
       return this.remote
         .then(openPage(PAGE_URL, selectors.ENTER_EMAIL.HEADER, {
@@ -111,10 +112,10 @@ define([
 
         .then(openVerificationLinkInNewTab(email, 0))
         .switchToWindow('newwindow')
-          .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER))
+          .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
 
-        .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER));
+        .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER));
     },
 
     'signin unverified': function () {
@@ -150,15 +151,15 @@ define([
 
     'email specified by relier, not registered': function () {
       return this.remote
-      .then(openPage(PAGE_URL, selectors.SIGNUP_PASSWORD.HEADER, {
-        query: {
-          email
-        },
-        webChannelResponses: {
-          'fxaccounts:can_link_account': { ok: true }
-        }
-      }))
-      .then(testElementValueEquals(selectors.SIGNUP_PASSWORD.EMAIL, email));
+        .then(openPage(PAGE_URL, selectors.SIGNUP_PASSWORD.HEADER, {
+          query: {
+            email
+          },
+          webChannelResponses: {
+            'fxaccounts:can_link_account': { ok: true }
+          }
+        }))
+        .then(testElementValueEquals(selectors.SIGNUP_PASSWORD.EMAIL, email));
     },
 
     'email specified by relier, registered': function () {

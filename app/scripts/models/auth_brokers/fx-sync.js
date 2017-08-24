@@ -19,7 +19,9 @@ define(function (require, exports, module) {
   const proto = BaseAuthenticationBroker.prototype;
 
   module.exports = BaseAuthenticationBroker.extend({
-    defaultBehaviors: _.extend({}, proto.defaultBehaviors, {
+    defaultCapabilities: _.extend({}, proto.defaultCapabilities, {
+      // Can CAD be displayed after the signin confirmation poll?
+      cadAfterSignInConfirmationPoll: false,
       // Can CAD be displayed after the signup confirmation poll?
       cadAfterSignUpConfirmationPoll: false
     }),
@@ -65,13 +67,35 @@ define(function (require, exports, module) {
       }
     },
 
+    afterSignInConfirmationPoll (account) {
+      return proto.afterSignInConfirmationPoll.call(this, account)
+        .then((defaultBehavior) => {
+          if (this.hasCapability('cadAfterSignInConfirmationPoll')) {
+            // This is a hack to allow us to differentiate between users
+            // who see CAD in the signin and verification tabs. CAD
+            // was added to the verification tab first, view names and view
+            // events are all unprefixed. In the signup tab, we force add
+            // the `signup` view name prefix so that events that contain
+            // viewNames have `signup` view name prefix.
+            //
+            // e.g.:
+            // screen.sms <- view the sms screen in the verification tab.
+            // screen.signup.sms <- view the sms screen in the signup tab.
+            this._metrics.setViewNamePrefix('signin');
+            return new ConnectAnotherDeviceBehavior(defaultBehavior);
+          }
+
+          return defaultBehavior;
+        });
+    },
+
     afterSignUpConfirmationPoll (account) {
       return proto.afterSignUpConfirmationPoll.call(this, account)
         .then((defaultBehavior) => {
           if (this.hasCapability('cadAfterSignUpConfirmationPoll')) {
             // This is a hack to allow us to differentiate between users
             // who see CAD in the signup and verification tabs. CAD
-            // was added to the verifiation tab first, view names and view
+            // was added to the verification tab first, view names and view
             // events are all unprefixed. In the signup tab, we force add
             // the `signup` view name prefix so that events that contain
             // viewNames have `signup` view name prefix.
