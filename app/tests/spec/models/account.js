@@ -67,7 +67,9 @@ define(function (require, exports, module) {
         },
         logEvent () {
           return {};
-        }
+        },
+        clearUid: sinon.spy(),
+        setUid: sinon.spy()
       };
       notifier = {
         trigger: sinon.spy()
@@ -286,6 +288,7 @@ define(function (require, exports, module) {
             sinon.stub(fxaClient, 'signIn', function () {
               return p({
                 sessionToken: SESSION_TOKEN,
+                uid: UID,
                 verificationMethod: VerificationMethods.EMAIL,
                 verificationReason: VerificationReasons.SIGN_UP,
                 verified: false
@@ -322,6 +325,13 @@ define(function (require, exports, module) {
           it('updates the account with the returned data', function () {
             assert.isFalse(account.get('verified'));
             assert.equal(account.get('sessionToken'), SESSION_TOKEN);
+            assert.equal(account.get('uid'), UID);
+          });
+
+          it('calls metrics.setUid correctly', () => {
+            assert.equal(metrics.setUid.callCount, 1);
+            assert.lengthOf(metrics.setUid.args[0], 1);
+            assert.equal(metrics.setUid.args[0][0], UID);
           });
         });
 
@@ -355,7 +365,14 @@ define(function (require, exports, module) {
             assert.equal(account.get('verificationMethod'), VerificationMethods.EMAIL);
             assert.equal(account.get('verificationReason'), VerificationReasons.SIGN_IN);
             assert.equal(account.get('sessionToken'), SESSION_TOKEN);
+            assert.equal(account.get('uid'), UID);
             assert.isFalse(account.get('verified'));
+          });
+
+          it('calls metrics.setUid correctly', () => {
+            assert.equal(metrics.setUid.callCount, 1);
+            assert.lengthOf(metrics.setUid.args[0], 1);
+            assert.equal(metrics.setUid.args[0][0], UID);
           });
         });
 
@@ -387,6 +404,13 @@ define(function (require, exports, module) {
           it('updates the account with the returned data', function () {
             assert.isTrue(account.get('verified'));
             assert.equal(account.get('sessionToken'), SESSION_TOKEN);
+            assert.equal(account.get('uid'), UID);
+          });
+
+          it('calls metrics.setUid correctly', () => {
+            assert.equal(metrics.setUid.callCount, 1);
+            assert.lengthOf(metrics.setUid.args[0], 1);
+            assert.equal(metrics.setUid.args[0][0], UID);
           });
         });
 
@@ -470,6 +494,10 @@ define(function (require, exports, module) {
 
           it('propagates the error', function () {
             assert.isTrue(AuthErrors.is(err, 'UNKNOWN_ACCOUNT'));
+          });
+
+          it('does not call metrics.setUid', () => {
+            assert.equal(metrics.setUid.callCount, 0);
           });
         });
       });
@@ -763,6 +791,11 @@ define(function (require, exports, module) {
         assert.isTrue(fxaClient.sessionDestroy.calledOnce);
         assert.isTrue(fxaClient.sessionDestroy.calledWith(SESSION_TOKEN));
       });
+
+      it('calls metrics.clearUid correctly', () => {
+        assert.equal(metrics.clearUid.callCount, 1);
+        assert.lengthOf(metrics.clearUid.args[0], 0);
+      });
     });
 
     describe('destroy', function () {
@@ -786,6 +819,11 @@ define(function (require, exports, module) {
 
       it('triggers a `destroy` message when complete', function () {
         assert.isTrue(account.trigger.calledWith('destroy', account));
+      });
+
+      it('calls metrics.clearUid correctly', () => {
+        assert.equal(metrics.clearUid.callCount, 1);
+        assert.lengthOf(metrics.clearUid.args[0], 0);
       });
     });
 

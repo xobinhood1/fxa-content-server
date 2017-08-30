@@ -57,6 +57,7 @@ define(function (require, exports, module) {
   const Url = require('lib/url');
   const User = require('models/user');
   const UserAgent = require('lib/user-agent');
+  const uuid = require('uuid');
   const WebChannel = require('lib/channels/web');
 
   function Start(options = {}) {
@@ -188,6 +189,7 @@ define(function (require, exports, module) {
         clientHeight: screenInfo.clientHeight,
         clientWidth: screenInfo.clientWidth,
         context: relier.get('context'),
+        deviceId: this._getMetricsDeviceId(),
         devicePixelRatio: screenInfo.devicePixelRatio,
         entrypoint: relier.get('entrypoint'),
         isSampledUser: isSampledUser,
@@ -424,6 +426,17 @@ define(function (require, exports, module) {
           window: this._window
         });
       }
+    },
+
+    _metricsDeviceId: null,
+    _getMetricsDeviceId () {
+      if (! this._metricsDeviceId) {
+        // Amplitude-specific device id. Transient for now,
+        // but will probably be persistent in the future.
+        this._metricsDeviceId = uuid.v4().replace(/-/g, '');
+      }
+
+      return this._metricsDeviceId;
     },
 
     _uniqueUserId: null,

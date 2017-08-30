@@ -244,12 +244,14 @@ define(function (require, exports, module) {
         xhr = { ajax () {} };
         environment = new Environment(windowMock);
         metrics = new Metrics({
+          deviceId: 'mock device id',
           environment: environment,
           inactivityFlushMs: 100,
           notifier,
           window: windowMock,
           xhr: xhr
         });
+        metrics.setUid('mock uid');
       });
 
       afterEach(function () {
@@ -297,9 +299,10 @@ define(function (require, exports, module) {
               assert.equal(windowMock.navigator.sendBeacon.getCall(0).args[0], '/metrics');
 
               var data = JSON.parse(windowMock.navigator.sendBeacon.getCall(0).args[1]);
-              assert.lengthOf(Object.keys(data), 27);
+              assert.lengthOf(Object.keys(data), 29);
               assert.equal(data.broker, 'none');
               assert.equal(data.context, Constants.CONTENT_SERVER_CONTEXT);
+              assert.equal(data.deviceId, 'mock device id');
               assert.isNumber(data.duration);
               assert.equal(data.entrypoint, 'none');
               assert.isArray(data.events);
@@ -325,6 +328,7 @@ define(function (require, exports, module) {
               assert.isDefined(data.flushTime);
               assert.isObject(data.timers);
               assert.lengthOf(Object.keys(data.timers), 0);
+              assert.equal(data.uid, 'mock uid');
               assert.equal(data.utm_campaign, 'none');
               assert.equal(data.utm_content, 'none');
               assert.equal(data.utm_medium, 'none');
@@ -356,6 +360,20 @@ define(function (require, exports, module) {
                 assert.equal(data.flowId, FLOW_ID);
                 assert.equal(data.flowBeginTime, FLOW_BEGIN_TIME);
               });
+            });
+          });
+
+          describe('clearUid then flush', () => {
+            beforeEach(function () {
+              sandbox.stub(windowMock.navigator, 'sendBeacon', () => true);
+              metrics.clearUid();
+              return metrics.flush();
+            });
+
+            it('calls sendBeacon correctly', function () {
+              assert.equal(windowMock.navigator.sendBeacon.callCount, 1);
+              const data = JSON.parse(windowMock.navigator.sendBeacon.getCall(0).args[1]);
+              assert.equal(data.uid, 'none');
             });
           });
 
@@ -427,7 +445,8 @@ define(function (require, exports, module) {
               assert.equal(settings.contentType, 'application/json');
 
               var data = JSON.parse(settings.data);
-              assert.lengthOf(Object.keys(data), 26);
+              assert.lengthOf(Object.keys(data), 28);
+              assert.equal(data.deviceId, 'mock device id');
               assert.isArray(data.events);
               assert.lengthOf(data.events, 5);
               assert.equal(data.events[0].type, 'foo');
@@ -435,6 +454,7 @@ define(function (require, exports, module) {
               assert.equal(data.events[2].type, 'baz');
               assert.equal(data.events[3].type, 'loaded');
               assert.equal(data.events[4].type, 'qux');
+              assert.equal(data.uid, 'mock uid');
             });
 
             it('resolves to true', function () {
@@ -505,7 +525,7 @@ define(function (require, exports, module) {
             assert.isTrue(metrics._send.getCall(0).args[1]);
 
             var data = metrics._send.getCall(0).args[0];
-            assert.lengthOf(Object.keys(data), 26);
+            assert.lengthOf(Object.keys(data), 28);
             assert.lengthOf(data.events, 5);
             assert.equal(data.events[0].type, 'foo');
             assert.equal(data.events[1].type, 'flow.bar');
@@ -530,7 +550,7 @@ define(function (require, exports, module) {
             assert.isTrue(metrics._send.getCall(0).args[1]);
 
             var data = metrics._send.getCall(0).args[0];
-            assert.lengthOf(Object.keys(data), 26);
+            assert.lengthOf(Object.keys(data), 28);
             assert.lengthOf(data.events, 5);
             assert.equal(data.events[0].type, 'foo');
             assert.equal(data.events[1].type, 'flow.bar');
