@@ -237,8 +237,8 @@ define([
 
         .then(openVerificationLinkInNewTab(secondaryEmail, 1))
         .switchToWindow('newwindow')
-        .then(testElementExists('#fxa-sign-in-complete-header'))
-        .then(closeCurrentWindow());
+          .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
+          .then(closeCurrentWindow());
     }
   });
 });
