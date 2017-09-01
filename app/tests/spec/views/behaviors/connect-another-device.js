@@ -29,7 +29,9 @@ define((require, exports, module) => {
           navigateToConnectAnotherDeviceScreen: sinon.spy()
         };
 
-        cadBehavior(view, account);
+        const promise = cadBehavior(view, account);
+        assert.ok(promise);
+        assert.isFunction(promise.then);
 
         assert.isTrue(view.isEligibleForConnectAnotherDevice.calledOnce);
         assert.isTrue(view.isEligibleForConnectAnotherDevice.calledWith(account));

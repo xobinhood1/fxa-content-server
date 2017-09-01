@@ -19,6 +19,10 @@ define(function (require, exports, module) {
   const proto = BaseAuthenticationBroker.prototype;
 
   module.exports = BaseAuthenticationBroker.extend({
+    defaultBehaviors: _.extend({}, proto.defaultBehaviors, {
+      afterCompleteSignUp: new ConnectAnotherDeviceBehavior(proto.defaultBehaviors.afterCompleteSignUp)
+    }),
+
     defaultCapabilities: _.extend({}, proto.defaultCapabilities, {
       // Can CAD be displayed after the signin confirmation poll?
       cadAfterSignInConfirmationPoll: false,

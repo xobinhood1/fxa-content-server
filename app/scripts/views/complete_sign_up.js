@@ -154,13 +154,7 @@ define(function (require, exports, module) {
       const relier = this.relier;
 
       return p().then(() => {
-        if (relier.isSync()) {
-          if (this.isEligibleForConnectAnotherDevice(account)) {
-            return this.navigateToConnectAnotherDeviceScreen(account);
-          } else {
-            this._navigateToVerifiedScreen();
-          }
-        } else if (relier.isOAuth()) {
+        if (relier.isSync() || relier.isOAuth()) {
           // If an OAuth user makes it here, they are either not signed in
           // or are verifying in a different tab. Show the "Account
           // verified!" screen to the user, the correct tab will have

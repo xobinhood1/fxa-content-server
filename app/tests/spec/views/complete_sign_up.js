@@ -484,40 +484,14 @@ define(function (require, exports, module) {
       });
 
       describe('sync relier', () => {
-        beforeEach(() => {
+        it('delegates to `_navigateToVerifiedScreen', () => {
           sinon.stub(relier, 'isSync', () => true);
           sinon.stub(relier, 'isOAuth', () => false);
-        });
-
-        describe('user is eligible for CAD', () => {
-          let account;
-
-          beforeEach(() => {
-            account = user.initAccount({});
-
-            sinon.stub(view, 'isEligibleForConnectAnotherDevice', () => true);
-            sinon.stub(view, 'navigateToConnectAnotherDeviceScreen', () => p());
-            sinon.stub(view, 'getAccount', () => account);
-
-            return view._navigateToNextScreen();
-          });
-
-          it('delegates to `navigateToConnectAnotherDeviceScreen`', () => {
-            assert.isTrue(view.navigateToConnectAnotherDeviceScreen.calledOnce);
-            assert.isTrue(view.navigateToConnectAnotherDeviceScreen.calledWith(account));
-          });
-        });
-
-        describe('user is not eligible to connect another device', () => {
-          beforeEach(() => {
-            sinon.stub(view, 'isEligibleForConnectAnotherDevice', () => false);
-            sinon.spy(view, '_navigateToVerifiedScreen');
-            return view._navigateToNextScreen();
-          });
-
-          it('delegates to `_navigateToVerifiedScreen`', () => {
-            assert.isTrue(view._navigateToVerifiedScreen.calledOnce);
-          });
+          sinon.spy(view, '_navigateToVerifiedScreen');
+          return view._navigateToNextScreen()
+            .then(() => {
+              assert.isTrue(view._navigateToVerifiedScreen.calledOnce);
+            });
         });
       });
 

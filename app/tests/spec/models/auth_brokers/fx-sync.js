@@ -6,6 +6,7 @@ define((require, exports, module) => {
   'use strict';
 
   const { assert } = require('chai');
+  const Account = require('models/account');
   const FxSyncAuthenticationBroker = require('models/auth_brokers/fx-sync');
   const Metrics = require('lib/metrics');
   const p = require('lib/promise');
@@ -45,7 +46,7 @@ define((require, exports, module) => {
     }
 
     beforeEach(() => {
-      account = {};
+      account = new Account();
       metrics = new Metrics();
       relier = new Relier();
       windowMock = new WindowMock();
@@ -150,6 +151,15 @@ define((require, exports, module) => {
               assert.equal(behavior.type, broker.getBehavior('afterSignUpConfirmationPoll').type);
 
               assert.isFalse(metrics.setViewNamePrefix.called);
+            });
+        });
+      });
+
+      describe('afterCompleteSignUp', () => {
+        it('returns a ConnectAnotherDeviceBehavior', () => {
+          return broker.afterCompleteSignUp(account)
+            .then((behavior) => {
+              assert.equal(behavior.type, 'connect-another-device');
             });
         });
       });
