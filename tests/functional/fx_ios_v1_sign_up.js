@@ -52,7 +52,7 @@ define([
       .then(testIsBrowserNotifiedOfLogin(email))
 
       // verify the user
-      .then(openVerificationLinkInNewTab(email, 0))
+      .then(openVerificationLinkInNewTab(email, 0, { query: { forceUA: userAgent }}))
       .switchToWindow('newwindow')
 
         .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))

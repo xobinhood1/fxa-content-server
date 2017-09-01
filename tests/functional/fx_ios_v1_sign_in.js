@@ -47,15 +47,15 @@ define([
   const setupTest = thenify(function (options) {
     options = options || {};
 
-    const successSelector = options.blocked ? '#fxa-signin-unblock-header' :
-                            options.preVerified ? '#fxa-confirm-signin-header' :
-                            '#fxa-confirm-header';
+    const successSelector = options.blocked ? selectors.SIGNIN_UNBLOCK.HEADER :
+                            options.preVerified ? selectors.CONFIRM_SIGNIN.HEADER :
+                            selectors.CONFIRM_SIGNUP.HEADER;
 
     return this.parent
       .then(createUser(email, PASSWORD, { preVerified: options.preVerified }))
       .then(openPage(SIGNIN_PAGE_URL, selectors.SIGNIN.HEADER, {
         query: {
-          forceUA: options.userAgent || UA_STRINGS['ios_firefox_6_0']
+          forceUA: options.forceUA || UA_STRINGS['ios_firefox_6_1']
         }
       }))
       .execute(listenForFxaCommands)
@@ -81,70 +81,86 @@ define([
     },
 
     'verified, verify same browser': function () {
-      return this.remote
-        .then(setupTest({ preVerified: true }))
+      const forceUA = UA_STRINGS['ios_firefox_6_1'];
 
-        .then(openVerificationLinkInNewTab(email, 0))
+      return this.remote
+        .then(setupTest({ forceUA, preVerified: true }))
+
+        .then(openVerificationLinkInNewTab(email, 0, {
+          query: {
+            forceUA
+          }
+        }))
         .switchToWindow('newwindow')
-          .then(testElementExists('#fxa-sign-in-complete-header'))
+          .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
 
-        // about:accounts will take over post-verification, no transition
-        .then(noPageTransition('#fxa-confirm-signin-header'));
+        .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER));
     },
 
     'verified, verify different browser - from original tab\'s P.O.V.': function () {
+      const forceUA = UA_STRINGS['ios_firefox_6_1'];
       return this.remote
-        .then(setupTest({ preVerified: true }))
+        .then(setupTest({ forceUA, preVerified: true }))
 
         .then(openVerificationLinkInDifferentBrowser(email))
 
-        // about:accounts will take over post-verification, no transition
-        .then(noPageTransition('#fxa-confirm-signin-header'));
+        .then(testElementExists(selectors.SIGNIN_COMPLETE.HEADER));
     },
 
     'Fx iOS <= 6.0 unverified, verify same browser': function () {
+      const forceUA = UA_STRINGS['ios_firefox_6_0'];
       return this.remote
-      .then(setupTest({ preVerified: false, userAgent: UA_STRINGS['ios_firefox_6_0'] }))
+      .then(setupTest({ forceUA, preVerified: false }))
 
         // email 0 - initial sign up email
         // email 1 - sign in w/ unverified address email
         // email 2 - "You have verified your Firefox Account"
-        .then(openVerificationLinkInNewTab(email, 1))
+        .then(openVerificationLinkInNewTab(email, 1, {
+          query: {
+            forceUA
+          }
+        }))
         .switchToWindow('newwindow')
-          .then(testElementExists('#fxa-connect-another-device-header'))
+          .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
 
-        // about:accounts will take over post-verification, no transition
-        .then(noPageTransition('#fxa-confirm-header'));
+        .then(testElementExists(selectors.CONFIRM_SIGNUP.HEADER));
     },
 
     'Fx iOS >= 6.1 unverified, verify same browser': function () {
+      const forceUA = UA_STRINGS['ios_firefox_6_1'];
       return this.remote
-        .then(setupTest({ preVerified: false, userAgent: UA_STRINGS['ios_firefox_6_1'] }))
+        .then(setupTest({ forceUA, preVerified: false }))
 
         // email 0 - initial sign up email
         // email 1 - sign in w/ unverified address email
         // email 2 - "You have verified your Firefox Account"
-        .then(openVerificationLinkInNewTab(email, 1))
+        .then(openVerificationLinkInNewTab(email, 1, {
+          query: {
+            forceUA
+          }
+        }))
         .switchToWindow('newwindow')
-          .then(testElementExists('#fxa-connect-another-device-header'))
+          .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
 
           // In Fx for iOS >= 6.1, user should redirect to the signup-complete
           // page after verification.
-          .then(testElementExists('#fxa-sign-up-complete-header'));
+          .then(testElementExists(selectors.SIGNUP_COMPLETE.HEADER));
     },
 
     'signup link is enabled': function () {
+      const forceUA = UA_STRINGS['ios_firefox_6_1'];
       return this.remote
-        .then(openPage(SIGNIN_PAGE_URL, selectors.SIGNIN.HEADER))
+        .then(openPage(SIGNIN_PAGE_URL, selectors.SIGNIN.HEADER, { query: { forceUA }}))
         .then(testElementExists('a[href^="/signup"]'));
     },
 
     'signin with an unknown account does not allow the user to sign up': function () {
+      const forceUA = UA_STRINGS['ios_firefox_6_1'];
       return this.remote
-        .then(openPage(SIGNIN_PAGE_URL, selectors.SIGNIN.HEADER))
+        .then(openPage(SIGNIN_PAGE_URL, selectors.SIGNIN.HEADER, { query: { forceUA } }))
         .execute(listenForFxaCommands)
 
         .then(fillOutSignIn(email, PASSWORD))
@@ -154,28 +170,29 @@ define([
 
     'blocked, valid code entered': function () {
       email = TestHelpers.createEmail('block{id}');
+      const forceUA = UA_STRINGS['ios_firefox_6_1'];
 
       return this.remote
-        .then(setupTest({ blocked: true, preVerified: true }))
+        .then(setupTest({ blocked: true, forceUA, preVerified: true }))
 
-        .then(testElementExists('#fxa-signin-unblock-header'))
-        .then(testElementTextInclude('.verification-email-message', email))
+        .then(testElementExists(selectors.SIGNIN_UNBLOCK.HEADER))
+        .then(testElementTextInclude(selectors.SIGNIN_UNBLOCK.EMAIL_FIELD, email))
         .then(fillOutSignInUnblock(email, 0))
 
         // about:accounts will take over post-unblock, no transition
-        .then(noPageTransition('#fxa-signin-unblock-header'))
+        .then(noPageTransition(selectors.SIGNIN_UNBLOCK.HEADER))
         .then(testIsBrowserNotifiedOfLogin(email, { expectVerified: true }));
     },
 
     'signup in desktop, send an SMS, open deferred deeplink in Fx for iOS': disableInProd(function () {
       const testPhoneNumber = TestHelpers.createPhoneNumber();
-      let signinUrlWithSigninCode;
+      const forceUA = UA_STRINGS['ios_firefox_6_1'];
 
       return this.remote
         // The phoneNumber is reused across tests, delete all
         // if its SMS messages to ensure a clean slate.
         .then(deleteAllSms(testPhoneNumber))
-        .then(setupTest(selectors.CONFIRM_SIGNUP.HEADER))
+        .then(setupTest({ forceUA, preVerified: true }))
 
         .then(openPage(SMS_PAGE_URL, selectors.SMS_SEND.HEADER))
         .then(type(selectors.SMS_SEND.PHONE_NUMBER, testPhoneNumber))
@@ -184,10 +201,14 @@ define([
         .then(testElementExists(selectors.SMS_SENT.HEADER))
         .then(getSmsSigninCode(testPhoneNumber, 0))
         .then(function (signinCode) {
-          signinUrlWithSigninCode = `${SIGNIN_PAGE_URL}&signin=${signinCode}`;
           return this.parent
             .then(clearBrowserState())
-            .then(openPage(signinUrlWithSigninCode, selectors.SIGNIN.HEADER))
+            .then(openPage(SIGNIN_PAGE_URL, selectors.SIGNIN.HEADER, {
+              query: {
+                forceUA,
+                signin: signinCode
+              }
+            }))
             .then(testElementTextEquals(selectors.SIGNIN.EMAIL_NOT_EDITABLE, email));
         });
     })
