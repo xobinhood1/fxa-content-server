@@ -21,32 +21,35 @@ define([
   let email;
   const PASSWORD = '12345678';
 
-  const thenify = FunctionalHelpers.thenify;
-  const clearBrowserState = FunctionalHelpers.clearBrowserState;
-  const click = FunctionalHelpers.click;
-  const closeCurrentWindow = FunctionalHelpers.closeCurrentWindow;
-  const createUser = FunctionalHelpers.createUser;
-  const deleteAllSms = FunctionalHelpers.deleteAllSms;
-  const disableInProd = FunctionalHelpers.disableInProd;
-  const fillOutSignIn = FunctionalHelpers.fillOutSignIn;
-  const fillOutSignInUnblock = FunctionalHelpers.fillOutSignInUnblock;
-  const getSmsSigninCode = FunctionalHelpers.getSmsSigninCode;
-  const listenForFxaCommands = FxDesktopHelpers.listenForFxaCommands;
-  const noPageTransition = FunctionalHelpers.noPageTransition;
-  const openPage = FunctionalHelpers.openPage;
-  const openVerificationLinkInDifferentBrowser = FunctionalHelpers.openVerificationLinkInDifferentBrowser;
-  const openVerificationLinkInNewTab = FunctionalHelpers.openVerificationLinkInNewTab;
-  const testElementExists = FunctionalHelpers.testElementExists;
-  const testElementTextEquals = FunctionalHelpers.testElementTextEquals;
-  const testElementTextInclude = FunctionalHelpers.testElementTextInclude;
-  const testIsBrowserNotified = FxDesktopHelpers.testIsBrowserNotifiedOfMessage;
-  const testIsBrowserNotifiedOfLogin = FxDesktopHelpers.testIsBrowserNotifiedOfLogin;
-  const type = FunctionalHelpers.type;
-  const visibleByQSA = FunctionalHelpers.visibleByQSA;
+  const {
+    clearBrowserState,
+    click,
+    closeCurrentWindow,
+    createUser,
+    deleteAllSms,
+    disableInProd,
+    fillOutSignIn,
+    fillOutSignInUnblock,
+    getSmsSigninCode,
+    noPageTransition,
+    openPage,
+    openVerificationLinkInDifferentBrowser,
+    openVerificationLinkInNewTab,
+    testElementExists,
+    testElementTextEquals,
+    testElementTextInclude,
+    thenify,
+    type,
+    visibleByQSA,
+  } = FunctionalHelpers;
 
-  const setupTest = thenify(function (options) {
-    options = options || {};
+  const {
+    listenForFxaCommands,
+    testIsBrowserNotifiedOfMessage: testIsBrowserNotified,
+    testIsBrowserNotifiedOfLogin,
+  } = FxDesktopHelpers;
 
+  const setupTest = thenify(function (options = {}) {
     const successSelector = options.blocked ? selectors.SIGNIN_UNBLOCK.HEADER :
                             options.preVerified ? selectors.CONFIRM_SIGNIN.HEADER :
                             selectors.CONFIRM_SIGNUP.HEADER;
@@ -86,11 +89,7 @@ define([
       return this.remote
         .then(setupTest({ forceUA, preVerified: true }))
 
-        .then(openVerificationLinkInNewTab(email, 0, {
-          query: {
-            forceUA
-          }
-        }))
+        .then(openVerificationLinkInNewTab(email, 0, { query: { forceUA } }))
         .switchToWindow('newwindow')
           .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
@@ -116,11 +115,7 @@ define([
         // email 0 - initial sign up email
         // email 1 - sign in w/ unverified address email
         // email 2 - "You have verified your Firefox Account"
-        .then(openVerificationLinkInNewTab(email, 1, {
-          query: {
-            forceUA
-          }
-        }))
+        .then(openVerificationLinkInNewTab(email, 1, { query: { forceUA } }))
         .switchToWindow('newwindow')
           .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
@@ -136,11 +131,7 @@ define([
         // email 0 - initial sign up email
         // email 1 - sign in w/ unverified address email
         // email 2 - "You have verified your Firefox Account"
-        .then(openVerificationLinkInNewTab(email, 1, {
-          query: {
-            forceUA
-          }
-        }))
+        .then(openVerificationLinkInNewTab(email, 1, { query: { forceUA } }))
         .switchToWindow('newwindow')
           .then(testElementExists(selectors.CONNECT_ANOTHER_DEVICE.HEADER))
           .then(closeCurrentWindow())
@@ -165,7 +156,7 @@ define([
 
         .then(fillOutSignIn(email, PASSWORD))
 
-        .then(visibleByQSA('.error'));
+        .then(visibleByQSA(selectors.SIGNIN.ERROR));
     },
 
     'blocked, valid code entered': function () {
